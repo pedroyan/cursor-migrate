@@ -1,0 +1,33 @@
+{
+  "name": "cursor-migrate",
+  "version": "0.1.0",
+  "description": "Move a project folder and preserve Cursor agent chat history",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pedroyan/cursor-migrate.git"
+  },
+  "type": "module",
+  "bin": {
+    "cursor-migrate": "./bin/cursor-migrate.js"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "keywords": [
+    "cursor",
+    "migrate",
+    "chat",
+    "agent",
+    "workspace"
+  ],
+  "scripts": {
+    "start": "node bin/cursor-migrate.js",
+    "test": "node --test test/*.test.js"
+  }
+}
