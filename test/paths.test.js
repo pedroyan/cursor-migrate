@@ -5,8 +5,8 @@ import { computeWorkspaceIdCandidates, getFolderBirthtimeMs } from "../lib/works
 
 test("encodeCursorProjectDir converts absolute paths", () => {
   assert.equal(
-    encodeCursorProjectDir("/Users/pedro/Project/Fintropya/MarkBlog"),
-    "Users-pedro-Project-Fintropya-MarkBlog",
+    encodeCursorProjectDir("/Users/pedro/Project/Personal/ledger-app"),
+    "Users-pedro-Project-Personal-ledger-app",
   );
 });
 

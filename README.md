@@ -32,7 +32,7 @@ npx cursor-migrate --from ~/Project/side-hustles/tiny-blog --to ~/Project/tiny-b
 Positional args also work:
 
 ```bash
-npx cursor-migrate ~/Project/side-hustles/MarkBlog ~/Project/MarkBlog/MarkBlog
+npx cursor-migrate ~/Project/experiments/weather-dash ~/Project/weather-dash/weather-dash-app
 ```
 
 **Important:** `--to` must be the **full destination path including the project folder name**, not just the parent directory. For example, use `~/Project/Sidequests/nomade-rico`, not `~/Project/Sidequests`. You may pre-create an **empty** folder at `--to`; the tool will move the project into it.

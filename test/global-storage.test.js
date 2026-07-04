@@ -105,3 +105,88 @@ test("patchGlobalStorage replaces path strings in other keys", () => {
   readDb.close();
   assert.equal(JSON.parse(row.value).gitRoot, toPath);
 });
+
+test("patchGlobalStorage remaps stale workspace id when paths already point to destination", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "cursor-migrate-global-"));
+  const dbPath = path.join(tmp, "state.vscdb");
+  const fromPath = "/Users/pedroyan/Project/Sidequests/nomade-rico";
+  const toPath = "/Users/pedroyan/Project/SQ2/nomade-rico";
+  const staleWs = "73c0274fa665774d735c138a7eeef70c";
+  const activeWs = "e0824df04e5a16206becf1a2327bb409";
+
+  const composers = ["a", "b", "c"].map((id) => ({
+    composerId: id,
+    workspaceIdentifier: {
+      id: staleWs,
+      uri: {
+        fsPath: toPath,
+        external: toFileUri(toPath),
+        path: toPath,
+        scheme: "file",
+      },
+    },
+  }));
+
+  createTestGlobalDb(dbPath, composers);
+
+  const migration = buildMigration(fromPath, toPath, staleWs, activeWs);
+  const result = patchGlobalStorage(migration, { dbPath, verify: true });
+
+  assert.equal(result.composerCounts.forWorkspace, 3);
+
+  const db = new DatabaseSync(dbPath, { readOnly: true });
+  const row = db.prepare("SELECT value FROM ItemTable WHERE key = 'composer.composerHeaders'").get();
+  db.close();
+  const data = JSON.parse(row.value);
+  const onActive = data.allComposers.filter((c) => c.workspaceIdentifier?.id === activeWs);
+  const onStale = data.allComposers.filter((c) => c.workspaceIdentifier?.id === staleWs);
+  assert.equal(onActive.length, 3);
+  assert.equal(onStale.length, 0);
+  assert.ok(onActive.every((c) => c.workspaceIdentifier.uri.fsPath === toPath));
+});
+
+test("patchGlobalStorage repair loop remaps composers from multiple stale ids to active id", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "cursor-migrate-global-"));
+  const dbPath = path.join(tmp, "state.vscdb");
+  const fromPath = "/Users/pedroyan/Project/Sidequests/nomade-rico";
+  const toPath = "/Users/pedroyan/Project/SQ2/nomade-rico";
+  const staleA = "73c0274fa665774d735c138a7eeef70c";
+  const staleB = "9b312f8538309b7c701dbddf59bb42f0";
+  const activeWs = "e0824df04e5a16206becf1a2327bb409";
+
+  createTestGlobalDb(dbPath, [
+    ...["x", "y"].map((id) => ({
+      composerId: id,
+      workspaceIdentifier: { id: staleA, uri: { fsPath: toPath } },
+    })),
+    {
+      composerId: "z",
+      workspaceIdentifier: { id: staleB, uri: { fsPath: toPath } },
+    },
+  ]);
+
+  patchGlobalStorage(buildMigration(fromPath, toPath, staleA, activeWs), { dbPath, verify: false });
+  const result = patchGlobalStorage(buildMigration(fromPath, toPath, staleB, activeWs), {
+    dbPath,
+    verify: true,
+  });
+
+  assert.equal(result.composerCounts.forWorkspace, 3);
+
+  const db = new DatabaseSync(dbPath, { readOnly: true });
+  const row = db.prepare("SELECT value FROM ItemTable WHERE key = 'composer.composerHeaders'").get();
+  db.close();
+  const data = JSON.parse(row.value);
+  assert.equal(
+    data.allComposers.filter((c) => c.workspaceIdentifier?.id === activeWs).length,
+    3,
+  );
+  assert.equal(
+    data.allComposers.filter((c) => c.workspaceIdentifier?.id === staleA).length,
+    0,
+  );
+  assert.equal(
+    data.allComposers.filter((c) => c.workspaceIdentifier?.id === staleB).length,
+    0,
+  );
+});

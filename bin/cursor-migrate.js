@@ -71,7 +71,7 @@ Options:
   -h, --help              Show this help
 
 Examples:
-  npx cursor-migrate --from ~/Project/Fintropya/MarkBlog --to ~/Project/MarkBlog/MarkBlog --quit-cursor
+  npx cursor-migrate --from ~/Project/Personal/ledger-app --to ~/Project/Sidequests/ledger-app --quit-cursor
   cursor-migrate --repair --no-move-repo --from ~/old/path --to ~/new/path --quit-cursor
 
 Notes:
