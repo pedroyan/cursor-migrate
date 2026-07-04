@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 
 import { parseArgs } from "node:util";
+import { assertNodeVersion } from "../lib/node-version.js";
 import { migrateProject } from "../lib/migrate.js";
+
+assertNodeVersion();
 
 const { values, positionals } = parseArgs({
   allowPositionals: true,
@@ -58,7 +61,7 @@ Usage:
 
 Options:
   -f, --from <path>       Current project folder
-  -t, --to <path>         New project folder
+  -t, --to <path>         New project folder (full path including folder name)
       --dry-run           Show what would happen without writing changes
       --no-move-repo      Only migrate Cursor metadata (repo already moved)
       --repair            Fix chat history after a move (use with --no-move-repo)
@@ -68,11 +71,13 @@ Options:
   -h, --help              Show this help
 
 Examples:
-  npx cursor-migrate --from ~/Project/Fintropya/MarkBlog --to ~/Project/MarkBlog/MarkBlog
-  cursor-migrate ./old/path ./new/path --quit-cursor
+  npx cursor-migrate --from ~/Project/Fintropya/MarkBlog --to ~/Project/MarkBlog/MarkBlog --quit-cursor
+  cursor-migrate --repair --no-move-repo --from ~/old/path --to ~/new/path --quit-cursor
 
 Notes:
-  - Close Cursor before migrating for best results.
+  - Quit Cursor completely before migrating (--quit-cursor attempts this on macOS, Linux, and Windows).
+  - --to must be the full destination path, not just the parent directory.
+  - Cross-volume moves copy the folder; use --repair if chats are missing afterward.
   - Backups are written to ~/Desktop/cursor-migrate-backup-<timestamp> by default.
   - Requires Node.js 22.5+ (built-in sqlite support).
 `);
