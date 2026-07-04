@@ -2,6 +2,7 @@
 
 import { parseArgs } from "node:util";
 import { assertNodeVersion } from "../lib/node-version.js";
+import { assertPlatformSupported } from "../lib/platform-support.js";
 import { migrateProject } from "../lib/migrate.js";
 
 assertNodeVersion();
@@ -25,6 +26,8 @@ if (values.help) {
   printHelp();
   process.exit(0);
 }
+
+assertPlatformSupported();
 
 const from = values.from ?? positionals[0];
 const to = values.to ?? positionals[1];
@@ -75,7 +78,8 @@ Examples:
   cursor-migrate --repair --no-move-repo --from ~/old/path --to ~/new/path --quit-cursor
 
 Notes:
-  - Quit Cursor completely before migrating (--quit-cursor attempts this on macOS, Linux, and Windows).
+  - Supported platforms: macOS and Linux. Windows is not currently supported (see GitHub for contribution info).
+  - Quit Cursor completely before migrating (--quit-cursor attempts this on macOS and Linux).
   - --to must be the full destination path, not just the parent directory. An empty pre-created folder is allowed.
   - Cross-volume moves copy the folder; use --repair if chats are missing afterward.
   - Backups are written to the cursor-migrate application folder (see log output for the full path).

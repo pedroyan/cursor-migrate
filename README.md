@@ -10,7 +10,8 @@ Move a project folder without losing Cursor agent chat history.
 
 ## Requirements
 
-- macOS or Linux (primary); Windows support is best-effort
+- macOS or Linux (validated on macOS; Linux untested in production)
+- Windows is **not supported** at the CLI entry point (code paths exist but are untested; see GitHub to contribute)
 - [Node.js](https://nodejs.org/) **22.5+** (uses the built-in `node:sqlite` module)
 - Cursor IDE
 
