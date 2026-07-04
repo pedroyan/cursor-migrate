@@ -37,15 +37,15 @@ npx cursor-migrate ~/Project/Fintropya/MarkBlog ~/Project/MarkBlog/MarkBlog
 
 ## Options
 
-| Flag | Description |
-|------|-------------|
-| `--from`, `-f` | Origin project directory |
-| `--to`, `-t` | Destination project directory |
-| `--dry-run` | Preview actions without writing |
+| Flag             | Description                                                    |
+| ---------------- | -------------------------------------------------------------- |
+| `--from`, `-f`   | Origin project directory                                       |
+| `--to`, `-t`     | Destination project directory                                  |
+| `--dry-run`      | Preview actions without writing                                |
 | `--no-move-repo` | Only migrate Cursor metadata (if you already moved the folder) |
-| `--skip-backup` | Skip Desktop backup |
-| `--quit-cursor` | Attempt to quit Cursor before migrating |
-| `--force` | Continue even if Cursor appears to be running |
+| `--skip-backup`  | Skip Desktop backup                                            |
+| `--quit-cursor`  | Attempt to quit Cursor before migrating                        |
+| `--force`        | Continue even if Cursor appears to be running                  |
 
 ## What it does
 
@@ -71,3 +71,7 @@ node bin/cursor-migrate.js --help
 ## License
 
 MIT
+
+## Test
+
+npx . /Users/pedroyan/Project/Personal/nomade-rico /Users/pedroyan/Project/Sidequests/nomade-rico

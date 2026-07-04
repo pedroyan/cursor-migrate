@@ -10,6 +10,7 @@ const { values, positionals } = parseArgs({
     to: { type: "string", short: "t" },
     "dry-run": { type: "boolean", default: false },
     "no-move-repo": { type: "boolean", default: false },
+    repair: { type: "boolean", default: false },
     "skip-backup": { type: "boolean", default: false },
     "quit-cursor": { type: "boolean", default: false },
     force: { type: "boolean", default: false },
@@ -40,6 +41,7 @@ try {
     skipBackup: values["skip-backup"],
     quitCursor: values["quit-cursor"],
     force: values.force,
+    repair: values.repair,
   });
   console.log("\nDone. Reopen the project in Cursor from its new path.");
 } catch (error) {
@@ -59,6 +61,7 @@ Options:
   -t, --to <path>         New project folder
       --dry-run           Show what would happen without writing changes
       --no-move-repo      Only migrate Cursor metadata (repo already moved)
+      --repair            Fix chat history after a move (use with --no-move-repo)
       --skip-backup       Do not create a Desktop backup first
       --quit-cursor       Attempt to quit Cursor before migrating
       --force             Continue even if Cursor appears to be running
