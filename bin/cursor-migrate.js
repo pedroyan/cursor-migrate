@@ -65,7 +65,7 @@ Options:
       --dry-run           Show what would happen without writing changes
       --no-move-repo      Only migrate Cursor metadata (repo already moved)
       --repair            Fix chat history after a move (use with --no-move-repo)
-      --skip-backup       Do not create a Desktop backup first
+      --skip-backup       Do not create a backup first
       --quit-cursor       Attempt to quit Cursor before migrating
       --force             Continue even if Cursor appears to be running
   -h, --help              Show this help
@@ -78,7 +78,7 @@ Notes:
   - Quit Cursor completely before migrating (--quit-cursor attempts this on macOS, Linux, and Windows).
   - --to must be the full destination path, not just the parent directory. An empty pre-created folder is allowed.
   - Cross-volume moves copy the folder; use --repair if chats are missing afterward.
-  - Backups are written to ~/Desktop/cursor-migrate-backup-<timestamp> by default.
+  - Backups are written to the cursor-migrate application folder (see log output for the full path).
   - Requires Node.js 22.5+ (built-in sqlite support).
 `);
 }

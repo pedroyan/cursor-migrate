@@ -46,17 +46,33 @@ npx cursor-migrate ~/Project/experiments/weather-dash ~/Project/weather-dash/wea
 | `--dry-run`      | Preview actions without writing                                 |
 | `--no-move-repo` | Only migrate Cursor metadata (if you already moved the folder)  |
 | `--repair`       | Fix chat history after a move (use with `--no-move-repo`)       |
-| `--skip-backup`  | Skip Desktop backup                                             |
+| `--skip-backup`  | Skip backup before migrating                                    |
 | `--quit-cursor`  | Attempt to quit Cursor before migrating                         |
 | `--force`        | Continue even if Cursor appears to be running                   |
 
 ## What it does
 
-1. Creates a backup on your Desktop (unless `--skip-backup`)
+1. Creates a backup under the cursor-migrate application data folder (unless `--skip-backup`); the full path is printed in the log
 2. Moves the project folder with `rename` on the same volume (preserves git + birthtime), or copies across volumes
 3. Renames the matching folder under `~/.cursor/projects/`
 4. Copies workspace storage to the workspace id Cursor uses at the new path (mirrored to nearby hash candidates)
 5. Rewrites the global composer index so existing conversations appear under the new workspace id
+
+## Backups
+
+Unless you pass `--skip-backup`, each run copies affected Cursor data into a timestamped folder. The CLI prints the full path:
+
+```
+[cursor-migrate] backup: Created backup at /Users/you/Library/Application Support/cursor-migrate/backups/cursor-migrate-backup-20260704-220100
+```
+
+Default backup root by platform:
+
+| Platform | Location |
+| -------- | -------- |
+| macOS | `~/Library/Application Support/cursor-migrate/backups/` |
+| Linux | `~/.local/share/cursor-migrate/backups/` |
+| Windows | `%APPDATA%\cursor-migrate\backups\` |
 
 ## Workflows
 
