@@ -35,7 +35,7 @@ Positional args also work:
 npx cursor-migrate ~/Project/side-hustles/MarkBlog ~/Project/MarkBlog/MarkBlog
 ```
 
-**Important:** `--to` must be the **full destination path including the project folder name**, not just the parent directory. For example, use `~/Project/Sidequests/nomade-rico`, not `~/Project/Sidequests`.
+**Important:** `--to` must be the **full destination path including the project folder name**, not just the parent directory. For example, use `~/Project/Sidequests/nomade-rico`, not `~/Project/Sidequests`. You may pre-create an **empty** folder at `--to`; the tool will move the project into it.
 
 ## Options
 
@@ -93,7 +93,7 @@ For repair, `--from` is still the **old path string** used for database matching
 | Symptom                           | What to try                                                                                          |
 | --------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | Chats missing after migrate       | Quit Cursor completely (`pgrep -x Cursor` should return nothing), then run `--repair --no-move-repo` |
-| "Destination already exists"      | `--to` is probably a parent directory — include the project folder name                              |
+| "Destination already exists and is not empty" | Remove files from `--to`, pick a new path, or pre-create an empty folder to receive the project |
 | Log says mapped but sidebar empty | Cursor may have been running during migrate, or multiple workspace folders exist — run `--repair`    |
 | Cross-volume move                 | Rerun with `--repair --no-move-repo` after opening the project once at the new path                  |
 
