@@ -92,7 +92,7 @@ For repair, `--from` is still the **old path string** used for database matching
 
 | Symptom                           | What to try                                                                                          |
 | --------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Chats missing after migrate       | Quit Cursor completely (`pgrep -x Cursor` should return nothing), then run `--repair --no-move-repo` |
+| Chats missing after migrate       | Quit Cursor completely (`osascript -e 'application "Cursor" is running'` → `false`), then run `--repair --no-move-repo` |
 | "Destination already exists and is not empty" | Remove files from `--to`, pick a new path, or pre-create an empty folder to receive the project |
 | Log says mapped but sidebar empty | Cursor may have been running during migrate, or multiple workspace folders exist — run `--repair`    |
 | Cross-volume move                 | Rerun with `--repair --no-move-repo` after opening the project once at the new path                  |
