@@ -82,18 +82,18 @@ Options:
       --repair            Fix chat history after a move (use with --no-move-repo)
       --revert            Interactively restore a previous backup
       --skip-backup       Do not create a backup first
-      --quit-cursor       Quit Cursor immediately without prompting
+      --quit-cursor       Quit Cursor immediately without prompting (append to any command)
       --force             Continue even if Cursor appears to be running
   -h, --help              Show this help
 
 Examples:
-  npx cursor-migrate --from ~/Project/Personal/ledger-app --to ~/Project/Sidequests/ledger-app --quit-cursor
-  cursor-migrate --repair --no-move-repo --from ~/old/path --to ~/new/path --quit-cursor
-  cursor-migrate --revert --quit-cursor
+  npx cursor-migrate --from ~/Project/Personal/ledger-app --to ~/Project/Sidequests/ledger-app
+  cursor-migrate --repair --no-move-repo --from ~/old/path --to ~/new/path
+  cursor-migrate --revert
 
 Notes:
   - Supported platforms: macOS and Linux. Windows is not currently supported (see GitHub for contribution info).
-  - Cursor must be quit before migrating. You will be prompted to quit if it is running; use --quit-cursor to skip the prompt.
+  - Cursor must be quit before migrating. If it is still running, the CLI prompts you; append --quit-cursor to any command to quit immediately.
   - --to must be the full destination path, not just the parent directory. An empty pre-created folder is allowed.
   - Cross-volume moves copy the folder; use --repair if chats are missing afterward.
   - Backups are written to the cursor-migrate application folder (see log output for the full path).

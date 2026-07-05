@@ -2,6 +2,34 @@
 
 Move a project folder without losing Cursor agent chat history.
 
+## Quick start
+
+**Migrate** — move the repo and remap Cursor metadata in one step:
+
+```bash
+npx cursor-migrate --from ~/Project/Personal/my-app --to ~/Project/Sidequests/my-app
+```
+
+**Repair** — you already moved the folder yourself and chats are missing from the sidebar:
+
+```bash
+npx cursor-migrate --repair --no-move-repo --from ~/Project/Personal/my-app --to ~/Project/Sidequests/my-app
+```
+
+For repair, `--from` is the **old path string** (the folder does not need to exist).
+
+**Revert** — undo a migration using a saved backup:
+
+```bash
+npx cursor-migrate --revert
+```
+
+For migrate and repair, `--to` must be the **full destination path including the project folder name** (e.g. `~/Project/Sidequests/my-app`, not just `~/Project/Sidequests`).
+
+Quit Cursor before running any command. If it is still open, the CLI prompts you — append `--quit-cursor` to any command above to quit immediately without the prompt.
+
+---
+
 `cursor-migrate` relocates your repository **and** remaps the Cursor metadata that actually powers the Agents sidebar:
 
 - `~/.cursor/projects/<encoded-path>/agent-transcripts`
@@ -21,13 +49,13 @@ Local development:
 
 ```bash
 npm link
-cursor-migrate --from ~/old/project --to ~/new/project --quit-cursor
+cursor-migrate --from ~/old/project --to ~/new/project
 ```
 
 Once published:
 
 ```bash
-npx cursor-migrate --from ~/Project/side-hustles/tiny-blog --to ~/Project/tiny-blog/tiny-blog-core --quit-cursor
+npx cursor-migrate --from ~/Project/side-hustles/tiny-blog --to ~/Project/tiny-blog/tiny-blog-core
 ```
 
 Positional args also work:
@@ -49,7 +77,7 @@ npx cursor-migrate ~/Project/experiments/weather-dash ~/Project/weather-dash/wea
 | `--repair`       | Fix chat history after a move (use with `--no-move-repo`)          |
 | `--revert`       | Interactively restore a previous backup                            |
 | `--skip-backup`  | Skip backup before migrating                                       |
-| `--quit-cursor`  | Quit Cursor immediately without prompting (when Cursor is running) |
+| `--quit-cursor`  | Append to any command to quit Cursor immediately without prompting   |
 | `--force`        | Continue even if Cursor appears to be running                      |
 
 ## What it does
@@ -95,7 +123,7 @@ Revert restores:
 - `~/.cursor/projects/<encoded-origin-path>/`
 - The project folder itself, when the original migrate run moved the repo
 
-Quit Cursor first (or pass `--quit-cursor`). Legacy backups without `manifest.json` are listed from folder contents when possible.
+Legacy backups without `manifest.json` are listed from folder contents when possible.
 
 ## Workflows
 
@@ -114,20 +142,20 @@ npx cursor-migrate --no-move-repo --from ~/Project/Personal/my-app --to ~/Projec
 **Repair** (repo moved but chats missing from the sidebar):
 
 ```bash
-npx cursor-migrate --repair --no-move-repo --from ~/Project/Personal/my-app --to ~/Project/Sidequests/my-app --quit-cursor
+npx cursor-migrate --repair --no-move-repo --from ~/Project/Personal/my-app --to ~/Project/Sidequests/my-app
 ```
 
 **Revert** (undo a migration using a saved backup):
 
 ```bash
-npx cursor-migrate --revert --quit-cursor
+npx cursor-migrate --revert
 ```
 
 For repair, `--from` is still the **old path string** used for database matching — the origin directory does not need to exist.
 
 ## Tips
 
-- **Quit Cursor first** — migration while Cursor is open can undo composer index changes. If Cursor is running, you will be prompted to quit; pass `--quit-cursor` to skip the prompt.
+- **Quit Cursor first** — migration while Cursor is open can undo composer index changes.
 - **Zero agent-transcript files does not mean no chat history.** Most conversations live in the global composer index and workspace `state.vscdb`, not in `agent-transcripts/*.jsonl`.
 - If conversations still do not appear after migration, open the project once at the new path, quit Cursor, and rerun with `--repair --no-move-repo`.
 - Workspace ids include folder birthtime; the tool mirrors data to nearby hash candidates and prefers an existing Cursor workspace folder when present.
