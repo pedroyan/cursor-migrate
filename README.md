@@ -28,6 +28,13 @@ npx cursor-migrate --from ~/Project/Personal/my-app --to ~/Project/Sidequests/my
 npx cursor-migrate --repair --no-move-repo --from ~/Project/Personal/my-app --to ~/Project/Sidequests/my-app
 ```
 
+If you use a custom Cursor profile (`cursor --user-data-dir=...`), pass the same directory:
+
+```bash
+npx cursor-migrate --user-data-dir ~/Documents/cursor-workspace/incention \
+  --from ~/Project/Personal/my-app --to ~/Project/Sidequests/my-app
+```
+
 For repair, `--from` is the **old path string** (the folder does not need to exist). `--to` must be the **full destination path including the project folder name**.
 
 **Revert** — undo a migration using a saved backup:
@@ -80,6 +87,7 @@ npx cursor-migrate ~/Project/experiments/weather-dash ~/Project/weather-dash/wea
 | `--revert`       | Interactively restore a previous backup                            |
 | `--skip-backup`  | Skip backup before migrating                                       |
 | `--quit-cursor`  | Append to any command to quit Cursor immediately without prompting |
+| `--user-data-dir <path>` | Cursor profile directory (same value as `cursor --user-data-dir`) |
 | `--force`        | Continue even if Cursor appears to be running                      |
 
 ## What it does
@@ -187,6 +195,8 @@ For repair, `--from` is still the **old path string** used for database matching
 | macOS    | `~/Library/Application Support/Cursor/User/` |
 | Linux    | `~/.config/Cursor/User/`                     |
 | Windows  | `%APPDATA%/Cursor/User/`                     |
+
+Custom profiles use `--user-data-dir` on both Cursor and `cursor-migrate`. Agent transcripts still live under `~/.cursor/projects/` (shared across profiles).
 
 ## Development
 

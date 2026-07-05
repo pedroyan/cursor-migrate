@@ -20,6 +20,7 @@ const { values, positionals } = parseArgs({
     revert: { type: "boolean", default: false },
     "quit-cursor": { type: "boolean", default: false },
     force: { type: "boolean", default: false },
+    "user-data-dir": { type: "string" },
     help: { type: "boolean", short: "h", default: false },
   },
 });
@@ -37,6 +38,7 @@ try {
       dryRun: values["dry-run"],
       quitCursor: values["quit-cursor"],
       force: values.force,
+      userDataDir: values["user-data-dir"],
     });
     console.log("\nDone. Reopen the project in Cursor from its original path.");
     process.exit(0);
@@ -60,6 +62,7 @@ try {
     quitCursor: values["quit-cursor"],
     force: values.force,
     repair: values.repair,
+    userDataDir: values["user-data-dir"],
   });
   console.log("\nDone. Reopen the project in Cursor from its new path.");
 } catch (error) {
@@ -83,12 +86,14 @@ Options:
       --revert            Interactively restore a previous backup
       --skip-backup       Do not create a backup first
       --quit-cursor       Quit Cursor immediately without prompting (append to any command)
+      --user-data-dir <path>  Cursor profile directory (same value as cursor --user-data-dir)
       --force             Continue even if Cursor appears to be running
   -h, --help              Show this help
 
 Examples:
   npx cursor-migrate --from ~/Project/Personal/ledger-app --to ~/Project/Sidequests/ledger-app
   cursor-migrate --repair --no-move-repo --from ~/old/path --to ~/new/path
+  cursor-migrate --user-data-dir ~/Documents/cursor-workspace/incention --from ~/old/path --to ~/new/path
   cursor-migrate --revert
 
 Notes:
