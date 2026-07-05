@@ -2,6 +2,11 @@
 
 Move a project folder without losing Cursor agent chat history.
 
+`cursor-migrate` relocates your repository **and** remaps the Cursor metadata that actually powers the Agents sidebar. This means that after you move your project to a new folder:
+
+✅ The chat history continues to work
+✅ References to the project (like in the "Open Recent" menu or the main Cursor window) are updated to point to the new folder
+
 ## Quick start
 
 **Migrate** — move the repo and remap Cursor metadata in one step:
@@ -27,14 +32,6 @@ npx cursor-migrate --revert
 For migrate and repair, `--to` must be the **full destination path including the project folder name** (e.g. `~/Project/Sidequests/my-app`, not just `~/Project/Sidequests`).
 
 Quit Cursor before running any command. If it is still open, the CLI prompts you — append `--quit-cursor` to any command above to quit immediately without the prompt.
-
----
-
-`cursor-migrate` relocates your repository **and** remaps the Cursor metadata that actually powers the Agents sidebar:
-
-- `~/.cursor/projects/<encoded-path>/agent-transcripts`
-- `~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-id>/` (macOS; see [Platform paths](#platform-paths))
-- `~/Library/Application Support/Cursor/User/globalStorage/state.vscdb` (`composer.composerHeaders`)
 
 ## Requirements
 
@@ -77,16 +74,24 @@ npx cursor-migrate ~/Project/experiments/weather-dash ~/Project/weather-dash/wea
 | `--repair`       | Fix chat history after a move (use with `--no-move-repo`)          |
 | `--revert`       | Interactively restore a previous backup                            |
 | `--skip-backup`  | Skip backup before migrating                                       |
-| `--quit-cursor`  | Append to any command to quit Cursor immediately without prompting   |
+| `--quit-cursor`  | Append to any command to quit Cursor immediately without prompting |
 | `--force`        | Continue even if Cursor appears to be running                      |
 
 ## What it does
 
 1. Creates a backup under the cursor-migrate application data folder (unless `--skip-backup`); the full path is printed in the log
 2. Moves the project folder with `rename` on the same volume (preserves git + birthtime), or copies across volumes
-3. Renames the matching folder under `~/.cursor/projects/`
+3. Renames the Cursor project folder and remaps agent transcripts
 4. Copies workspace storage to the workspace id Cursor uses at the new path (mirrored to nearby hash candidates)
-5. Rewrites the global composer index so existing conversations appear under the new workspace id
+5. Rewrites the global composer index and path references in Cursor's storage so conversations and "Open Recent" follow the new location
+
+## Cursor data locations
+
+These are the main on-disk locations the tool reads and rewrites (macOS paths shown; see [Platform paths](#platform-paths) for Linux and Windows):
+
+- `~/.cursor/projects/<encoded-path>/agent-transcripts`
+- `~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-id>/`
+- `~/Library/Application Support/Cursor/User/globalStorage/state.vscdb` (`composer.composerHeaders`)
 
 ## Backups
 
