@@ -40,7 +40,7 @@ Write for a **future agent with no chat history**: what broke, how you verified 
 
 ## Non-negotiable rules
 
-1. **Cursor must be quit** before migrate/repair (migrate without flags should error while Cursor is open; or use `--quit-cursor`). Open Cursor reverts the composer index.
+1. **Cursor must be quit** before migrate/repair. Use `--quit-cursor` to skip the prompt and quit immediately; open Cursor reverts the composer index.
 2. **Verify in the database**, not log lines — count `composer.composerHeaders` entries per workspace id (see `priv-notes/06-dev-and-testing.md`).
 3. **Multiple workspace hash folders** per path are normal. Composers may be on a different id than the largest `state.vscdb`.
 4. **`0 transcript files` ≠ no history** — check global composer index.
@@ -51,7 +51,7 @@ Write for a **future agent with no chat history**: what broke, how you verified 
 ## Quick triage: “chats missing after migrate”
 
 ```bash
-# 1. Quit Cursor (Cmd+Q). While open, migrate without flags should error.
+# 1. Quit Cursor (Cmd+Q). While open, migrate will prompt to quit (or use --quit-cursor to skip the prompt).
 osascript -e 'application "Cursor" is running'  # expect false before migrate
 
 # 2. Repair (from = old path string, to = current folder)
