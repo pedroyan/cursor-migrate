@@ -69,7 +69,7 @@ Options:
       --no-move-repo      Only migrate Cursor metadata (repo already moved)
       --repair            Fix chat history after a move (use with --no-move-repo)
       --skip-backup       Do not create a backup first
-      --quit-cursor       Attempt to quit Cursor before migrating
+      --quit-cursor       Quit Cursor immediately without prompting
       --force             Continue even if Cursor appears to be running
   -h, --help              Show this help
 
@@ -79,7 +79,7 @@ Examples:
 
 Notes:
   - Supported platforms: macOS and Linux. Windows is not currently supported (see GitHub for contribution info).
-  - Quit Cursor completely before migrating (--quit-cursor attempts this on macOS and Linux).
+  - Cursor must be quit before migrating. You will be prompted to quit if it is running; use --quit-cursor to skip the prompt.
   - --to must be the full destination path, not just the parent directory. An empty pre-created folder is allowed.
   - Cross-volume moves copy the folder; use --repair if chats are missing afterward.
   - Backups are written to the cursor-migrate application folder (see log output for the full path).

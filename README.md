@@ -48,7 +48,7 @@ npx cursor-migrate ~/Project/experiments/weather-dash ~/Project/weather-dash/wea
 | `--no-move-repo` | Only migrate Cursor metadata (if you already moved the folder)  |
 | `--repair`       | Fix chat history after a move (use with `--no-move-repo`)       |
 | `--skip-backup`  | Skip backup before migrating                                    |
-| `--quit-cursor`  | Attempt to quit Cursor before migrating                         |
+| `--quit-cursor`  | Quit Cursor immediately without prompting (when Cursor is running) |
 | `--force`        | Continue even if Cursor appears to be running                   |
 
 ## What it does
@@ -99,7 +99,7 @@ For repair, `--from` is still the **old path string** used for database matching
 
 ## Tips
 
-- **Quit Cursor first** — migration while Cursor is open can undo composer index changes. Use `--quit-cursor` on macOS, Linux, and Windows.
+- **Quit Cursor first** — migration while Cursor is open can undo composer index changes. If Cursor is running, you will be prompted to quit; pass `--quit-cursor` to skip the prompt.
 - **Zero agent-transcript files does not mean no chat history.** Most conversations live in the global composer index and workspace `state.vscdb`, not in `agent-transcripts/*.jsonl`.
 - If conversations still do not appear after migration, open the project once at the new path, quit Cursor, and rerun with `--repair --no-move-repo`.
 - Workspace ids include folder birthtime; the tool mirrors data to nearby hash candidates and prefers an existing Cursor workspace folder when present.
