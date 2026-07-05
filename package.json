@@ -1,6 +1,6 @@
 {
   "name": "cursor-migrate",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Move a project folder and preserve Cursor agent chat history",
   "license": "MIT",
   "author": "pedroyan",
