@@ -4,6 +4,7 @@ import { parseArgs } from "node:util";
 import { assertNodeVersion } from "../lib/node-version.js";
 import { assertPlatformSupported } from "../lib/platform-support.js";
 import { migrateProject } from "../lib/migrate.js";
+import { revertFromBackup } from "../lib/revert.js";
 
 assertNodeVersion();
 
@@ -16,6 +17,7 @@ const { values, positionals } = parseArgs({
     "no-move-repo": { type: "boolean", default: false },
     repair: { type: "boolean", default: false },
     "skip-backup": { type: "boolean", default: false },
+    revert: { type: "boolean", default: false },
     "quit-cursor": { type: "boolean", default: false },
     force: { type: "boolean", default: false },
     help: { type: "boolean", short: "h", default: false },
@@ -29,16 +31,26 @@ if (values.help) {
 
 assertPlatformSupported();
 
-const from = values.from ?? positionals[0];
-const to = values.to ?? positionals[1];
-
-if (!from || !to) {
-  console.error("Error: origin and destination paths are required.\n");
-  printHelp();
-  process.exit(1);
-}
-
 try {
+  if (values.revert) {
+    await revertFromBackup({
+      dryRun: values["dry-run"],
+      quitCursor: values["quit-cursor"],
+      force: values.force,
+    });
+    console.log("\nDone. Reopen the project in Cursor from its original path.");
+    process.exit(0);
+  }
+
+  const from = values.from ?? positionals[0];
+  const to = values.to ?? positionals[1];
+
+  if (!from || !to) {
+    console.error("Error: origin and destination paths are required.\n");
+    printHelp();
+    process.exit(1);
+  }
+
   await migrateProject({
     from,
     to,
@@ -68,6 +80,7 @@ Options:
       --dry-run           Show what would happen without writing changes
       --no-move-repo      Only migrate Cursor metadata (repo already moved)
       --repair            Fix chat history after a move (use with --no-move-repo)
+      --revert            Interactively restore a previous backup
       --skip-backup       Do not create a backup first
       --quit-cursor       Quit Cursor immediately without prompting
       --force             Continue even if Cursor appears to be running
@@ -76,6 +89,7 @@ Options:
 Examples:
   npx cursor-migrate --from ~/Project/Personal/ledger-app --to ~/Project/Sidequests/ledger-app --quit-cursor
   cursor-migrate --repair --no-move-repo --from ~/old/path --to ~/new/path --quit-cursor
+  cursor-migrate --revert --quit-cursor
 
 Notes:
   - Supported platforms: macOS and Linux. Windows is not currently supported (see GitHub for contribution info).

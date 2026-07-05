@@ -47,6 +47,7 @@ npx cursor-migrate ~/Project/experiments/weather-dash ~/Project/weather-dash/wea
 | `--dry-run`      | Preview actions without writing                                 |
 | `--no-move-repo` | Only migrate Cursor metadata (if you already moved the folder)  |
 | `--repair`       | Fix chat history after a move (use with `--no-move-repo`)       |
+| `--revert`       | Interactively restore a previous backup                          |
 | `--skip-backup`  | Skip backup before migrating                                    |
 | `--quit-cursor`  | Quit Cursor immediately without prompting (when Cursor is running) |
 | `--force`        | Continue even if Cursor appears to be running                   |
@@ -75,6 +76,27 @@ Default backup root by platform:
 | Linux | `~/.local/share/cursor-migrate/backups/` |
 | Windows | `%APPDATA%\cursor-migrate\backups\` |
 
+Each backup includes a `manifest.json` with the origin path, destination path, and list of copied artifacts.
+
+## Revert a bad migration
+
+If a migration went wrong, use `--revert` to pick a backup and roll back Cursor metadata (and the repo move, when applicable):
+
+```bash
+npx cursor-migrate --revert --quit-cursor
+```
+
+The CLI lists backups labeled as `<origin> --> <destination>`. Use ↑/↓ to select, Enter to confirm. Add `--dry-run` to preview without writing.
+
+Revert restores:
+
+- Global composer index (`state.vscdb`)
+- Origin workspace storage (when present in the backup)
+- `~/.cursor/projects/<encoded-origin-path>/`
+- The project folder itself, when the original migrate run moved the repo
+
+Quit Cursor first (or pass `--quit-cursor`). Legacy backups without `manifest.json` are listed from folder contents when possible.
+
 ## Workflows
 
 **Standard migration** (repo not moved yet):
@@ -93,6 +115,12 @@ npx cursor-migrate --no-move-repo --from ~/Project/Personal/my-app --to ~/Projec
 
 ```bash
 npx cursor-migrate --repair --no-move-repo --from ~/Project/Personal/my-app --to ~/Project/Sidequests/my-app --quit-cursor
+```
+
+**Revert** (undo a migration using a saved backup):
+
+```bash
+npx cursor-migrate --revert --quit-cursor
 ```
 
 For repair, `--from` is still the **old path string** used for database matching — the origin directory does not need to exist.
