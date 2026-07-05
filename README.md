@@ -2,13 +2,15 @@
 
 Move a project folder without losing Cursor agent chat history.
 
-`cursor-migrate` relocates your repository **and** remaps the Cursor metadata that actually powers the Agents sidebar. This means that after you move your project to a new folder:
+`cursor-migrate` relocates your repository **and** remaps the Cursor metadata that actually powers the Agents sidebar. This means that after you move your project to a new folder using `cursor-migrate`:
 
 ✅ The chat history continues to work.
 
 ✅ References to the project (like in the "Open Recent" menu or the main Cursor window) are updated to the new place.
 
 ✅ Usually avoids a full codebase re-index (embedding pointers are copied with workspace storage).
+
+✅ You won't have to worry about a supply chain attack since this package has zero dependencies.
 
 ## Quick start
 
