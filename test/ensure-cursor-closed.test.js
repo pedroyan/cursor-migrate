@@ -107,3 +107,54 @@ test("ensureCursorClosed throws when Cursor remains running after quit", async (
     /Cursor is still running\. Close it manually and retry\./,
   );
 });
+
+test("ensureCursorClosed polls until Cursor has exited", async () => {
+  let pollChecks = 0;
+  let quitSent = false;
+  const sleepCalls = [];
+  const { calls, deps } = createDeps({
+    isCursorRunning: () => {
+      if (!quitSent) return true;
+      pollChecks += 1;
+      return pollChecks < 3;
+    },
+    quitCursor: () => {
+      quitSent = true;
+      calls.quit += 1;
+      return { ok: true };
+    },
+    sleep: async (ms) => {
+      sleepCalls.push(ms);
+    },
+  });
+  await ensureCursorClosed({ quitCursor: true }, deps);
+  assert.equal(calls.quit, 1);
+  assert.equal(pollChecks, 3);
+  assert.equal(sleepCalls.length, 3);
+});
+
+test("ensureCursorClosed polls up to max attempts before failing", async () => {
+  let pollChecks = 0;
+  let quitSent = false;
+  const sleepCalls = [];
+  const { deps } = createDeps({
+    isCursorRunning: () => {
+      if (!quitSent) return true;
+      pollChecks += 1;
+      return true;
+    },
+    quitCursor: () => {
+      quitSent = true;
+      return { ok: true };
+    },
+    sleep: async (ms) => {
+      sleepCalls.push(ms);
+    },
+  });
+  await assert.rejects(
+    () => ensureCursorClosed({ quitCursor: true }, deps),
+    /Cursor is still running\. Close it manually and retry\./,
+  );
+  assert.equal(pollChecks, 10);
+  assert.equal(sleepCalls.length, 10);
+});
