@@ -40,17 +40,17 @@ npx cursor-migrate ~/Project/experiments/weather-dash ~/Project/weather-dash/wea
 
 ## Options
 
-| Flag             | Description                                                     |
-| ---------------- | --------------------------------------------------------------- |
-| `--from`, `-f`   | Origin project directory                                        |
-| `--to`, `-t`     | Destination project directory (full path including folder name) |
-| `--dry-run`      | Preview actions without writing                                 |
-| `--no-move-repo` | Only migrate Cursor metadata (if you already moved the folder)  |
-| `--repair`       | Fix chat history after a move (use with `--no-move-repo`)       |
-| `--revert`       | Interactively restore a previous backup                          |
-| `--skip-backup`  | Skip backup before migrating                                    |
+| Flag             | Description                                                        |
+| ---------------- | ------------------------------------------------------------------ |
+| `--from`, `-f`   | Origin project directory                                           |
+| `--to`, `-t`     | Destination project directory (full path including folder name)    |
+| `--dry-run`      | Preview actions without writing                                    |
+| `--no-move-repo` | Only migrate Cursor metadata (if you already moved the folder)     |
+| `--repair`       | Fix chat history after a move (use with `--no-move-repo`)          |
+| `--revert`       | Interactively restore a previous backup                            |
+| `--skip-backup`  | Skip backup before migrating                                       |
 | `--quit-cursor`  | Quit Cursor immediately without prompting (when Cursor is running) |
-| `--force`        | Continue even if Cursor appears to be running                   |
+| `--force`        | Continue even if Cursor appears to be running                      |
 
 ## What it does
 
@@ -70,11 +70,11 @@ Unless you pass `--skip-backup`, each run copies affected Cursor data into a tim
 
 Default backup root by platform:
 
-| Platform | Location |
-| -------- | -------- |
-| macOS | `~/Library/Application Support/cursor-migrate/backups/` |
-| Linux | `~/.local/share/cursor-migrate/backups/` |
-| Windows | `%APPDATA%\cursor-migrate\backups\` |
+| Platform | Location                                                |
+| -------- | ------------------------------------------------------- |
+| macOS    | `~/Library/Application Support/cursor-migrate/backups/` |
+| Linux    | `~/.local/share/cursor-migrate/backups/`                |
+| Windows  | `%APPDATA%\cursor-migrate\backups\`                     |
 
 Each backup includes a `manifest.json` with the origin path, destination path, and list of copied artifacts.
 
@@ -83,7 +83,7 @@ Each backup includes a `manifest.json` with the origin path, destination path, a
 If a migration went wrong, use `--revert` to pick a backup and roll back Cursor metadata (and the repo move, when applicable):
 
 ```bash
-npx cursor-migrate --revert --quit-cursor
+npx cursor-migrate --revert
 ```
 
 The CLI lists backups labeled as `<origin> --> <destination>`. Use ↑/↓ to select, Enter to confirm. Add `--dry-run` to preview without writing.
@@ -102,13 +102,13 @@ Quit Cursor first (or pass `--quit-cursor`). Legacy backups without `manifest.js
 **Standard migration** (repo not moved yet):
 
 ```bash
-npx cursor-migrate --from ~/Project/Personal/my-app --to ~/Project/Sidequests/my-app --quit-cursor
+npx cursor-migrate --from ~/Project/Personal/my-app --to ~/Project/Sidequests/my-app
 ```
 
 **Metadata only** (repo already moved manually):
 
 ```bash
-npx cursor-migrate --no-move-repo --from ~/Project/Personal/my-app --to ~/Project/Sidequests/my-app --quit-cursor
+npx cursor-migrate --no-move-repo --from ~/Project/Personal/my-app --to ~/Project/Sidequests/my-app
 ```
 
 **Repair** (repo moved but chats missing from the sidebar):
@@ -135,12 +135,12 @@ For repair, `--from` is still the **old path string** used for database matching
 
 ## Troubleshooting
 
-| Symptom                           | What to try                                                                                          |
-| --------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Chats missing after migrate       | Quit Cursor completely (`osascript -e 'application "Cursor" is running'` → `false`), then run `--repair --no-move-repo` |
-| "Destination already exists and is not empty" | Remove files from `--to`, pick a new path, or pre-create an empty folder to receive the project |
-| Log says mapped but sidebar empty | Cursor may have been running during migrate, or multiple workspace folders exist — run `--repair`    |
-| Cross-volume move                 | Rerun with `--repair --no-move-repo` after opening the project once at the new path                  |
+| Symptom                                       | What to try                                                                                                             |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Chats missing after migrate                   | Quit Cursor completely (`osascript -e 'application "Cursor" is running'` → `false`), then run `--repair --no-move-repo` |
+| "Destination already exists and is not empty" | Remove files from `--to`, pick a new path, or pre-create an empty folder to receive the project                         |
+| Log says mapped but sidebar empty             | Cursor may have been running during migrate, or multiple workspace folders exist — run `--repair`                       |
+| Cross-volume move                             | Rerun with `--repair --no-move-repo` after opening the project once at the new path                                     |
 
 ## Platform paths
 
