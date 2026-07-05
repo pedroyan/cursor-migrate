@@ -2,13 +2,15 @@
 
 Move a project folder without losing Cursor agent chat history.
 
-`cursor-migrate` relocates your repository **and** remaps the Cursor metadata that actually powers the Agents sidebar. This means that after you move your project to a new folder:
+`cursor-migrate` relocates your repository **and** remaps the Cursor metadata that actually powers the Agents sidebar. This means that after you move your project to a new folder using `cursor-migrate`:
 
 ✅ The chat history continues to work.
 
 ✅ References to the project (like in the "Open Recent" menu or the main Cursor window) are updated to the new place.
 
 ✅ Usually avoids a full codebase re-index (embedding pointers are copied with workspace storage).
+
+✅ You won't have to worry about a supply chain attack since this package has zero dependencies.
 
 ## Quick start
 
@@ -35,6 +37,35 @@ npx cursor-migrate --revert
 ```
 
 Quit Cursor before running any command. If it is still open, the CLI prompts you — append `--quit-cursor` to any command above to quit immediately without the prompt.
+
+## Custom Cursor profile
+
+If you launch Cursor with a custom profile:
+
+```bash
+cursor --user-data-dir=~/Documents/cursor-workspace/work
+```
+
+pass the same path to `cursor-migrate`:
+
+```bash
+npx cursor-migrate \
+  --user-data-dir ~/Documents/cursor-workspace/work \
+  --from ~/Project/Personal/my-app \
+  --to ~/Project/Sidequests/my-app
+```
+
+Repair and revert work the same way — add `--user-data-dir` to point at the profile that owns the project:
+
+```bash
+npx cursor-migrate --repair --no-move-repo \
+  --user-data-dir ~/Documents/cursor-workspace/work \
+  --from ~/Project/Personal/my-app --to ~/Project/Sidequests/my-app
+
+npx cursor-migrate --revert --user-data-dir ~/Documents/cursor-workspace/work
+```
+
+Without `--user-data-dir`, the tool uses the default Cursor data folder (`~/Library/Application Support/Cursor/` on macOS). Revert reads the profile from the backup manifest when you omit the flag.
 
 ## Requirements
 
@@ -78,6 +109,7 @@ npx cursor-migrate ~/Project/experiments/weather-dash ~/Project/weather-dash/wea
 | `--revert`       | Interactively restore a previous backup                            |
 | `--skip-backup`  | Skip backup before migrating                                       |
 | `--quit-cursor`  | Append to any command to quit Cursor immediately without prompting |
+| `--user-data-dir <path>` | Cursor profile directory (same value as `cursor --user-data-dir`) |
 | `--force`        | Continue even if Cursor appears to be running                      |
 
 ## What it does
@@ -159,6 +191,13 @@ npx cursor-migrate --repair --no-move-repo --from ~/Project/Personal/my-app --to
 npx cursor-migrate --revert
 ```
 
+**Custom profile** (when you use `cursor --user-data-dir=...`):
+
+```bash
+npx cursor-migrate --user-data-dir ~/Documents/cursor-workspace/work \
+  --from ~/Project/Personal/my-app --to ~/Project/Sidequests/my-app
+```
+
 For repair, `--from` is still the **old path string** used for database matching — the origin directory does not need to exist.
 
 ## Tips
@@ -185,6 +224,8 @@ For repair, `--from` is still the **old path string** used for database matching
 | macOS    | `~/Library/Application Support/Cursor/User/` |
 | Linux    | `~/.config/Cursor/User/`                     |
 | Windows  | `%APPDATA%/Cursor/User/`                     |
+
+Custom profiles use `--user-data-dir` on both Cursor and `cursor-migrate`. Agent transcripts still live under `~/.cursor/projects/` (shared across profiles).
 
 ## Development
 
