@@ -13,6 +13,8 @@ Move a project folder without losing Cursor agent chat history.
 **Migrate** — move the repo and remap Cursor metadata in one step:
 
 ```bash
+npx cursor-migrate <source> <destination>
+npx cursor-migrate ~/Project/Personal/my-app ~/Project/Sidequests/my-app
 npx cursor-migrate --from ~/Project/Personal/my-app --to ~/Project/Sidequests/my-app
 ```
 
@@ -22,15 +24,13 @@ npx cursor-migrate --from ~/Project/Personal/my-app --to ~/Project/Sidequests/my
 npx cursor-migrate --repair --no-move-repo --from ~/Project/Personal/my-app --to ~/Project/Sidequests/my-app
 ```
 
-For repair, `--from` is the **old path string** (the folder does not need to exist).
+For repair, `--from` is the **old path string** (the folder does not need to exist). `--to` must be the **full destination path including the project folder name**.
 
 **Revert** — undo a migration using a saved backup:
 
 ```bash
 npx cursor-migrate --revert
 ```
-
-For migrate and repair, `--to` must be the **full destination path including the project folder name** (e.g. `~/Project/Sidequests/my-app`, not just `~/Project/Sidequests`).
 
 Quit Cursor before running any command. If it is still open, the CLI prompts you — append `--quit-cursor` to any command above to quit immediately without the prompt.
 
