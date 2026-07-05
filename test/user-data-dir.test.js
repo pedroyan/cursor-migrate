@@ -46,10 +46,10 @@ test("buildBackupManifestMeta records userDataDir when provided", () => {
     moveRepo: true,
     oldWorkspaceId: "abc",
     artifacts: [],
-    userDataDir: "/Users/me/Documents/cursor-workspace/incention",
+    userDataDir: "/Users/me/Documents/cursor-workspace/work",
   });
 
-  assert.equal(meta.userDataDir, "/Users/me/Documents/cursor-workspace/incention");
+  assert.equal(meta.userDataDir, "/Users/me/Documents/cursor-workspace/work");
 });
 
 test("applyRevert restores global storage to custom user data dir from manifest", () => {

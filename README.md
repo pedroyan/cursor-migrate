@@ -28,13 +28,6 @@ npx cursor-migrate --from ~/Project/Personal/my-app --to ~/Project/Sidequests/my
 npx cursor-migrate --repair --no-move-repo --from ~/Project/Personal/my-app --to ~/Project/Sidequests/my-app
 ```
 
-If you use a custom Cursor profile (`cursor --user-data-dir=...`), pass the same directory:
-
-```bash
-npx cursor-migrate --user-data-dir ~/Documents/cursor-workspace/incention \
-  --from ~/Project/Personal/my-app --to ~/Project/Sidequests/my-app
-```
-
 For repair, `--from` is the **old path string** (the folder does not need to exist). `--to` must be the **full destination path including the project folder name**.
 
 **Revert** — undo a migration using a saved backup:
@@ -44,6 +37,35 @@ npx cursor-migrate --revert
 ```
 
 Quit Cursor before running any command. If it is still open, the CLI prompts you — append `--quit-cursor` to any command above to quit immediately without the prompt.
+
+## Custom Cursor profile
+
+If you launch Cursor with a custom profile:
+
+```bash
+cursor --user-data-dir=~/Documents/cursor-workspace/work
+```
+
+pass the same path to `cursor-migrate`:
+
+```bash
+npx cursor-migrate \
+  --user-data-dir ~/Documents/cursor-workspace/work \
+  --from ~/Project/Personal/my-app \
+  --to ~/Project/Sidequests/my-app
+```
+
+Repair and revert work the same way — add `--user-data-dir` to point at the profile that owns the project:
+
+```bash
+npx cursor-migrate --repair --no-move-repo \
+  --user-data-dir ~/Documents/cursor-workspace/work \
+  --from ~/Project/Personal/my-app --to ~/Project/Sidequests/my-app
+
+npx cursor-migrate --revert --user-data-dir ~/Documents/cursor-workspace/work
+```
+
+Without `--user-data-dir`, the tool uses the default Cursor data folder (`~/Library/Application Support/Cursor/` on macOS). Revert reads the profile from the backup manifest when you omit the flag.
 
 ## Requirements
 
@@ -167,6 +189,13 @@ npx cursor-migrate --repair --no-move-repo --from ~/Project/Personal/my-app --to
 
 ```bash
 npx cursor-migrate --revert
+```
+
+**Custom profile** (when you use `cursor --user-data-dir=...`):
+
+```bash
+npx cursor-migrate --user-data-dir ~/Documents/cursor-workspace/work \
+  --from ~/Project/Personal/my-app --to ~/Project/Sidequests/my-app
 ```
 
 For repair, `--from` is still the **old path string** used for database matching — the origin directory does not need to exist.

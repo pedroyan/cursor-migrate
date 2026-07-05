@@ -93,7 +93,7 @@ Options:
 Examples:
   npx cursor-migrate --from ~/Project/Personal/ledger-app --to ~/Project/Sidequests/ledger-app
   cursor-migrate --repair --no-move-repo --from ~/old/path --to ~/new/path
-  cursor-migrate --user-data-dir ~/Documents/cursor-workspace/incention --from ~/old/path --to ~/new/path
+  cursor-migrate --user-data-dir ~/Documents/cursor-workspace/work --from ~/old/path --to ~/new/path
   cursor-migrate --revert
 
 Notes:
