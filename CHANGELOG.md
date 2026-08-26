@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.2.2 — 2026-08-26
+
+`0.2.1` remapped the `composerHeaders` table, but the Agents Window could still point at the old folder (`name` / `~/displayPath`), a sibling path that shared a prefix (`everest` vs `everest-dashboard`) could be rewritten, and repair could attach chats to a birthtime **+1** mirror that Cursor never opens.
 
 **Fixed**
 
@@ -12,7 +14,13 @@
 
 - GitHub remotes are still not rewritten. The Agents Window Repositories list may keep the old repo name (`everest`) after the folder is `quickscope-notes`.
 
-Until this is tagged, run from the repo (`npx .`), not `npx cursor-migrate` (npm is still 0.2.1).
+If you already migrated with `0.2.1` and the Agents Window or history clock is empty, quit Cursor and rerun:
+
+```bash
+npx cursor-migrate --repair --no-move-repo --from <old-path> --to <new-path>
+```
+
+Add `--user-data-dir` if the project lives in a custom Cursor profile.
 
 ## 0.2.1 — 2026-08-26
 
