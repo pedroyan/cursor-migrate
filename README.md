@@ -71,7 +71,7 @@ Without `--user-data-dir`, the tool uses the default Cursor data folder (`~/Libr
 
 - macOS or Linux (validated on macOS; Linux untested in production)
 - Windows is **not supported** at the CLI entry point (code paths exist but are untested; see GitHub to contribute)
-- [Node.js](https://nodejs.org/) **22.5+** (uses the built-in `node:sqlite` module)
+- [Node.js](https://nodejs.org/) **24.13.0+** (the version this tool is tested on; uses built-in `node:sqlite`)
 - Cursor IDE
 
 ## Install / run
