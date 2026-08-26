@@ -1,14 +1,16 @@
 # Changelog
 
-## Unreleased
-
-- Require **Node.js 24.13.0+** (the version this tool is tested on). Older runtimes exit with a clear error.
-
 ## 0.2.1 — 2026-08-26
+
+Requires **[Node.js](https://nodejs.org/) 24.13.0 or later** — the version this tool is tested on. Older runtimes (including Node 22) exit with an error. `npx` does not install Node for you; upgrade Node first if the CLI refuses to start.
 
 Works with the **new Agents Window** in current Cursor.
 
 Cursor moved the conversation index out of the old `composer.composerHeaders` JSON blob and into a dedicated `composerHeaders` SQLite table. `0.2.0` still patched only the blob, so migrate/repair could report success while the Agents Window and history clock stayed empty (open tabs could still appear from copied workspace UI state).
+
+**Changed**
+
+- Require **Node.js 24.13.0+** (the version this tool is tested on). Older runtimes, including Node 22, exit with a clear error.
 
 **Fixed**
 

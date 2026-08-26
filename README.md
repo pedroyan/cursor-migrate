@@ -12,6 +12,8 @@ Move a project folder without losing Cursor agent chat history.
 
 ✅ You won't have to worry about a supply chain attack since this package has zero dependencies.
 
+**Requires [Node.js](https://nodejs.org/) 24.13.0 or later** (the version this tool is tested on). Older Node, including 22, is rejected. `npx` uses whatever `node` is on your PATH — upgrade Node if the CLI exits immediately.
+
 ## Quick start
 
 **Migrate** — move the repo and remap Cursor metadata in one step:
@@ -71,7 +73,7 @@ Without `--user-data-dir`, the tool uses the default Cursor data folder (`~/Libr
 
 - macOS or Linux (validated on macOS; Linux untested in production)
 - Windows is **not supported** at the CLI entry point (code paths exist but are untested; see GitHub to contribute)
-- [Node.js](https://nodejs.org/) **24.13.0+** (the version this tool is tested on; uses built-in `node:sqlite`)
+- [Node.js](https://nodejs.org/) **24.13.0 or later** — this is the author's tested runtime, not only the `node:sqlite` minimum. The CLI exits below 24.13.0. `engines` in `package.json` is `>=24.13.0`.
 - Cursor IDE
 
 ## Install / run
