@@ -6,6 +6,7 @@
 
 - Replace folder paths only at a path-segment boundary so migrating `…/everest` does not rewrite `…/everest-dashboard`.
 - Remap Agents Window / glass `name` and `~/displayPath` (not only `composerHeaders`), so the project list does not keep pointing at the old folder.
+- Repair no longer remaps chats to the last-written birthtime mirror (+1) when Cursor will open delta 0. Prefer the predicted id unless one dest folder was clearly written later (real open).
 
 **Not changed**
 

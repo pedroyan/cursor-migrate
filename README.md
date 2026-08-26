@@ -217,6 +217,7 @@ For repair, `--from` is still the **old path string** used for database matching
 | Chats missing after migrate                   | Quit Cursor completely (`osascript -e 'application "Cursor" is running'` → `false`), then run `--repair --no-move-repo` |
 | "Destination already exists and is not empty" | Remove files from `--to`, pick a new path, or pre-create an empty folder to receive the project                         |
 | Log says mapped but sidebar empty             | Cursor may have been running during migrate, or multiple workspace folders exist — run `--repair`                       |
+| History clock empty, old agent tab still open | Repair may have remapped to a birthtime **+1** mirror. Quit Cursor and rerun `--repair` from this repo (fixed after 0.2.1) |
 | History clock empty after repair, tabs still open | Fixed in **0.2.1** (new Agents Window index). Upgrade, quit Cursor, then `--repair --no-move-repo`. |
 | Agents Window still shows the old folder name | Paths/workspace ids may be fixed while the **GitHub remote** is still `github.com/org/old-name`. The tool does not rename remotes. Also remaps glass `name` + `~/displayPath` (repo-only until the next npm release — use `npx .`) |
 | Sibling project paths rewritten (`everest` → `everest-dashboard`) | Fixed after 0.2.1: path replace is prefix-safe. Repair from this repo if a migrate already corrupted a longer sibling path |
