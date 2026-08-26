@@ -7,6 +7,7 @@ import {
   findWorkspaceStorageIdsForFolder,
   findActiveWorkspaceStorageId,
 } from "../lib/discover.js";
+import { pickWorkspaceId, pickWorkspaceIdMirrorTargets } from "../lib/workspace-id.js";
 import { toFileUri } from "../lib/paths.js";
 
 function createWorkspaceEntry(root, id, folderPath, { dbSize = 1024, mtimeMs = Date.now() } = {}) {
@@ -54,4 +55,39 @@ test("findActiveWorkspaceStorageId prefers recently modified small db", () => {
 
   const activeId = findActiveWorkspaceStorageId(target, toFileUri(target), { workspaceRoot: root });
   assert.equal(activeId, "ws-live");
+});
+
+test("findActiveWorkspaceStorageId prefers birthtime delta 0 among clustered dest mirrors", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "cursor-migrate-discover-"));
+  const target = path.join(tmp, "quickscope-notes");
+  const workspaceRoot = path.join(tmp, "ws");
+  fs.mkdirSync(target, { recursive: true });
+  fs.mkdirSync(workspaceRoot, { recursive: true });
+
+  const delta0 = pickWorkspaceId(target);
+  const mirrors = pickWorkspaceIdMirrorTargets(target);
+  const now = Date.now();
+  for (const [index, id] of mirrors.entries()) {
+    createWorkspaceEntry(workspaceRoot, id, target, { dbSize: 307_200, mtimeMs: now + index * 10 });
+  }
+
+  const activeId = findActiveWorkspaceStorageId(target, toFileUri(target), { workspaceRoot });
+  assert.equal(activeId, delta0);
+});
+
+test("findActiveWorkspaceStorageId prefers the dest id Cursor wrote after open", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "cursor-migrate-discover-"));
+  const target = path.join(tmp, "quickscope-notes");
+  const workspaceRoot = path.join(tmp, "ws");
+  fs.mkdirSync(target, { recursive: true });
+  fs.mkdirSync(workspaceRoot, { recursive: true });
+
+  const delta0 = pickWorkspaceId(target);
+  const plus1 = pickWorkspaceIdMirrorTargets(target).find((id) => id !== delta0);
+  const now = Date.now();
+  createWorkspaceEntry(workspaceRoot, delta0, target, { dbSize: 307_200, mtimeMs: now - 60_000 });
+  createWorkspaceEntry(workspaceRoot, plus1, target, { dbSize: 4096, mtimeMs: now });
+
+  const activeId = findActiveWorkspaceStorageId(target, toFileUri(target), { workspaceRoot });
+  assert.equal(activeId, plus1);
 });

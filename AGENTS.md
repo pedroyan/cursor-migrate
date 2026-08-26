@@ -10,6 +10,7 @@ This repo moves project folders while preserving Cursor agent chat history. Most
    - `priv-notes/07-nomade-rico-incident.md` — first migrate / hash delta
    - `priv-notes/09-nomade-rico-second-migration.md` — chained migrate / multiple origin ids
    - `priv-notes/11-quickscope-composer-headers-table.md` — current Cursor `composerHeaders` table vs ItemTable blob
+ - `priv-notes/12-everest-quickscope-notes-agents-window.md` — table remapped but Agents Window empty (`name` / `~/displayPath` / path prefix)
 4. **For algorithm or module questions**, use `priv-notes/03-migration-algorithm.md` and `priv-notes/04-codebase-map.md`.
 
 ## Bug fixes: use TDD

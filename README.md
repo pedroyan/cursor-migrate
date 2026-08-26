@@ -217,8 +217,10 @@ For repair, `--from` is still the **old path string** used for database matching
 | Chats missing after migrate                   | Quit Cursor completely (`osascript -e 'application "Cursor" is running'` → `false`), then run `--repair --no-move-repo` |
 | "Destination already exists and is not empty" | Remove files from `--to`, pick a new path, or pre-create an empty folder to receive the project                         |
 | Log says mapped but sidebar empty             | Cursor may have been running during migrate, or multiple workspace folders exist — run `--repair`                       |
+| History clock empty, old agent tab still open | Repair may have remapped to a birthtime **+1** mirror. Fixed in **0.2.2**. Upgrade, quit Cursor, then `--repair --no-move-repo`. |
 | History clock empty after repair, tabs still open | Fixed in **0.2.1** (new Agents Window index). Upgrade, quit Cursor, then `--repair --no-move-repo`. |
-| Agents Window still shows the old folder name | Paths/workspace ids may be fixed while the **GitHub remote** is still `github.com/org/old-name`. The tool does not rename remotes |
+| Agents Window still shows the old folder name | **0.2.2** remaps glass `name` + `~/displayPath`. If the list still uses the old name after upgrade + `--repair`, the **GitHub remote** is still `github.com/org/old-name` — the tool does not rename remotes. |
+| Sibling project paths rewritten (`everest` → `everest-dashboard`) | Fixed in **0.2.2**: path replace is prefix-safe. Upgrade and `--repair` if a migrate already corrupted a longer sibling path |
 | Cross-volume move                             | Rerun with `--repair --no-move-repo` after opening the project once at the new path                                     |
 
 ## Platform paths

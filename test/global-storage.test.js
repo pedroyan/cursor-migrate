@@ -249,6 +249,129 @@ test("patchGlobalStorage verify throws when composerHeaders table still has conv
   );
 });
 
+test("patchGlobalStorage does not rewrite a sibling folder that shares a path prefix", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "cursor-migrate-global-"));
+  const dbPath = path.join(tmp, "state.vscdb");
+  const fromPath = "/Users/me/Project/hardscope/everest";
+  const toPath = "/Users/me/Project/hardscope/quickscope-notes";
+  const siblingPath = "/Users/me/Project/hardscope/everest-dashboard";
+  const oldWs = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+  const newWs = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+  const siblingWs = "cccccccccccccccccccccccccccccccc";
+
+  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+  const db = new DatabaseSync(dbPath);
+  db.exec("CREATE TABLE ItemTable (key TEXT PRIMARY KEY, value TEXT)");
+  db.prepare("INSERT INTO ItemTable (key, value) VALUES (?, ?)").run(
+    "composer.composerHeaders",
+    JSON.stringify({ allComposers: [] }),
+  );
+  db.prepare("INSERT INTO ItemTable (key, value) VALUES (?, ?)").run(
+    "workspaceMetadata.entries",
+    JSON.stringify({
+      entries: [
+        {
+          workspaceId: siblingWs,
+          displayPath: "~/Project/hardscope/everest-dashboard",
+          folderUri: `file://${siblingPath}`,
+          paths: [{ uri: { fsPath: siblingPath, external: `file://${siblingPath}`, path: siblingPath } }],
+        },
+      ],
+    }),
+  );
+  createComposerHeadersTable(db);
+  insertComposerHeadersRow(db, { composerId: "keep-sibling", workspaceId: siblingWs, fsPath: siblingPath });
+  db.close();
+
+  patchGlobalStorage(buildMigration(fromPath, toPath, oldWs, newWs), { dbPath, verify: false });
+
+  const readDb = new DatabaseSync(dbPath, { readOnly: true });
+  const meta = JSON.parse(
+    readDb.prepare("SELECT value FROM ItemTable WHERE key = 'workspaceMetadata.entries'").get().value,
+  );
+  const header = readDb
+    .prepare("SELECT workspaceId, value FROM composerHeaders WHERE composerId = ?")
+    .get("keep-sibling");
+  readDb.close();
+
+  assert.equal(meta.entries[0].folderUri, `file://${siblingPath}`);
+  assert.equal(meta.entries[0].paths[0].uri.fsPath, siblingPath);
+  assert.equal(meta.entries[0].displayPath, "~/Project/hardscope/everest-dashboard");
+  assert.equal(header.workspaceId, siblingWs);
+  assert.equal(JSON.parse(header.value).workspaceIdentifier.uri.fsPath, siblingPath);
+});
+
+test("patchGlobalStorage remaps tilde displayPath and workspace name used by the Agents Window", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "cursor-migrate-global-"));
+  const dbPath = path.join(tmp, "state.vscdb");
+  const fromPath = path.join(os.homedir(), "Project", "hardscope", "everest");
+  const toPath = path.join(os.homedir(), "Project", "hardscope", "quickscope-notes");
+  const oldWs = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+  const newWs = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+
+  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+  const db = new DatabaseSync(dbPath);
+  db.exec("CREATE TABLE ItemTable (key TEXT PRIMARY KEY, value TEXT)");
+  db.prepare("INSERT INTO ItemTable (key, value) VALUES (?, ?)").run(
+    "composer.composerHeaders",
+    JSON.stringify({ allComposers: [] }),
+  );
+  db.prepare("INSERT INTO ItemTable (key, value) VALUES (?, ?)").run(
+    "cursor/glass.additionalProjects",
+    JSON.stringify([
+      {
+        type: "workspace",
+        id: `workspace:${oldWs}`,
+        name: "everest",
+        displayPath: "~/Project/hardscope/everest",
+        repoUrls: ["github.com/acme/everest"],
+        workspaceIdentifier: {
+          id: oldWs,
+          uri: { fsPath: fromPath, external: toFileUri(fromPath), path: fromPath, scheme: "file" },
+        },
+      },
+    ]),
+  );
+  db.prepare("INSERT INTO ItemTable (key, value) VALUES (?, ?)").run(
+    "workspaceMetadata.entries",
+    JSON.stringify({
+      entries: [
+        {
+          workspaceId: oldWs,
+          displayPath: "~/Project/hardscope/everest",
+          folderUri: toFileUri(fromPath),
+        },
+      ],
+    }),
+  );
+  createComposerHeadersTable(db);
+  insertComposerHeadersRow(db, { composerId: "chat-1", workspaceId: oldWs, fsPath: fromPath });
+  db.close();
+
+  const result = patchGlobalStorage(buildMigration(fromPath, toPath, oldWs, newWs), {
+    dbPath,
+    verify: true,
+  });
+  assert.equal(result.composerCounts.forWorkspace, 1);
+
+  const readDb = new DatabaseSync(dbPath, { readOnly: true });
+  const projects = JSON.parse(
+    readDb.prepare("SELECT value FROM ItemTable WHERE key = 'cursor/glass.additionalProjects'").get().value,
+  );
+  const meta = JSON.parse(
+    readDb.prepare("SELECT value FROM ItemTable WHERE key = 'workspaceMetadata.entries'").get().value,
+  );
+  readDb.close();
+
+  assert.equal(projects[0].name, "quickscope-notes");
+  assert.equal(projects[0].displayPath, "~/Project/hardscope/quickscope-notes");
+  assert.equal(projects[0].id, `workspace:${newWs}`);
+  assert.deepEqual(projects[0].repoUrls, ["github.com/acme/everest"]);
+  assert.equal(projects[0].workspaceIdentifier.uri.fsPath, toPath);
+  assert.equal(meta.entries[0].displayPath, "~/Project/hardscope/quickscope-notes");
+  assert.equal(meta.entries[0].folderUri, toFileUri(toPath));
+});
+
 test("patchGlobalStorage does not rewrite GitHub remote URLs that share the folder name", () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "cursor-migrate-global-"));
   const dbPath = path.join(tmp, "state.vscdb");
