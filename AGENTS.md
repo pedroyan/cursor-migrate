@@ -9,6 +9,7 @@ This repo moves project folders while preserving Cursor agent chat history. Most
 3. **If the user reports missing chats**, read the relevant incident postmortem:
    - `priv-notes/07-nomade-rico-incident.md` — first migrate / hash delta
    - `priv-notes/09-nomade-rico-second-migration.md` — chained migrate / multiple origin ids
+   - `priv-notes/11-quickscope-composer-headers-table.md` — current Cursor `composerHeaders` table vs ItemTable blob
 4. **For algorithm or module questions**, use `priv-notes/03-migration-algorithm.md` and `priv-notes/04-codebase-map.md`.
 
 ## Bug fixes: use TDD
@@ -41,7 +42,7 @@ Write for a **future agent with no chat history**: what broke, how you verified 
 ## Non-negotiable rules
 
 1. **Cursor must be quit** before migrate/repair. Use `--quit-cursor` to skip the prompt and quit immediately; open Cursor reverts the composer index.
-2. **Verify in the database**, not log lines — count `composer.composerHeaders` entries per workspace id (see `priv-notes/06-dev-and-testing.md`).
+2. **Verify in the database**, not log lines — count `composerHeaders` rows per `workspaceId` (current Cursor) or `ItemTable` `composer.composerHeaders` on older builds (see `priv-notes/06-dev-and-testing.md`).
 3. **Multiple workspace hash folders** per path are normal. Composers may be on a different id than the largest `state.vscdb`.
 4. **`0 transcript files` ≠ no history** — check global composer index.
 5. **`--to` is the full destination path** including the project folder name.
