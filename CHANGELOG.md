@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+**Fixed**
+
+- Replace folder paths only at a path-segment boundary so migrating `…/everest` does not rewrite `…/everest-dashboard`.
+- Remap Agents Window / glass `name` and `~/displayPath` (not only `composerHeaders`), so the project list does not keep pointing at the old folder.
+
+**Not changed**
+
+- GitHub remotes are still not rewritten. The Agents Window Repositories list may keep the old repo name (`everest`) after the folder is `quickscope-notes`.
+
+Until this is tagged, run from the repo (`npx .`), not `npx cursor-migrate` (npm is still 0.2.1).
+
 ## 0.2.1 — 2026-08-26
 
 Requires **[Node.js](https://nodejs.org/) 24.13.0 or later** — the version this tool is tested on. Older runtimes (including Node 22) exit with an error. `npx` does not install Node for you; upgrade Node first if the CLI refuses to start.
