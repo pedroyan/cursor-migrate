@@ -126,7 +126,7 @@ These are the main on-disk locations the tool reads and rewrites (macOS paths sh
 
 - `~/.cursor/projects/<encoded-path>/agent-transcripts`
 - `~/Library/Application Support/Cursor/User/workspaceStorage/<workspace-id>/`
-- `~/Library/Application Support/Cursor/User/globalStorage/state.vscdb` (`composer.composerHeaders`)
+- `~/Library/Application Support/Cursor/User/globalStorage/state.vscdb` (`composerHeaders` table on current Cursor; older builds used `ItemTable` key `composer.composerHeaders`)
 
 ## Backups
 
@@ -215,6 +215,8 @@ For repair, `--from` is still the **old path string** used for database matching
 | Chats missing after migrate                   | Quit Cursor completely (`osascript -e 'application "Cursor" is running'` → `false`), then run `--repair --no-move-repo` |
 | "Destination already exists and is not empty" | Remove files from `--to`, pick a new path, or pre-create an empty folder to receive the project                         |
 | Log says mapped but sidebar empty             | Cursor may have been running during migrate, or multiple workspace folders exist — run `--repair`                       |
+| History clock empty after repair, tabs still open | Current Cursor stores the list in the `composerHeaders` SQLite table. `cursor-migrate@0.2.0` does not remap it — run a newer build from this repo, quit Cursor, then `--repair` |
+| Agents Window still shows the old folder name | Paths/workspace ids may be fixed while the **GitHub remote** is still `github.com/org/old-name`. The tool does not rename remotes |
 | Cross-volume move                             | Rerun with `--repair --no-move-repo` after opening the project once at the new path                                     |
 
 ## Platform paths

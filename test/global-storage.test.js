@@ -145,6 +145,144 @@ test("patchGlobalStorage remaps stale workspace id when paths already point to d
   assert.ok(onActive.every((c) => c.workspaceIdentifier.uri.fsPath === toPath));
 });
 
+function createComposerHeadersTable(db) {
+  db.exec(`CREATE TABLE composerHeaders (
+    composerId TEXT PRIMARY KEY,
+    workspaceId TEXT,
+    createdAt INTEGER,
+    lastUpdatedAt INTEGER,
+    isArchived INTEGER,
+    isSubagent INTEGER,
+    recency INTEGER,
+    checkpointAt INTEGER,
+    value TEXT
+  )`);
+}
+
+function insertComposerHeadersRow(db, { composerId, workspaceId, fsPath }) {
+  db.prepare(
+    `INSERT INTO composerHeaders (composerId, workspaceId, createdAt, lastUpdatedAt, isArchived, isSubagent, recency, checkpointAt, value)
+     VALUES (?, ?, 1, 1, 0, 0, 1, 1, ?)`,
+  ).run(
+    composerId,
+    workspaceId,
+    JSON.stringify({
+      composerId,
+      name: "Legacy chat",
+      workspaceIdentifier: {
+        id: workspaceId,
+        uri: { fsPath, external: toFileUri(fsPath), path: fsPath, scheme: "file" },
+      },
+      trackedGitRepos: [{ repoPath: fsPath }],
+    }),
+  );
+}
+
+test("patchGlobalStorage remaps dedicated composerHeaders table used by current Cursor", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "cursor-migrate-global-"));
+  const dbPath = path.join(tmp, "state.vscdb");
+  const fromPath = path.join(tmp, "old", "everest-dashboard");
+  const toPath = path.join(tmp, "new", "quickscope");
+  const oldWs = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+  const newWs = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+
+  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+  const db = new DatabaseSync(dbPath);
+  db.exec("CREATE TABLE ItemTable (key TEXT PRIMARY KEY, value TEXT)");
+  db.prepare("INSERT INTO ItemTable (key, value) VALUES (?, ?)").run(
+    "composer.composerHeaders",
+    JSON.stringify({ allComposers: [] }),
+  );
+  createComposerHeadersTable(db);
+  insertComposerHeadersRow(db, { composerId: "chat-1", workspaceId: oldWs, fsPath: fromPath });
+  insertComposerHeadersRow(db, { composerId: "chat-2", workspaceId: oldWs, fsPath: fromPath });
+  db.close();
+
+  const result = patchGlobalStorage(buildMigration(fromPath, toPath, oldWs, newWs), {
+    dbPath,
+    verify: true,
+  });
+
+  assert.equal(result.composerCounts.forWorkspace, 2);
+
+  const readDb = new DatabaseSync(dbPath, { readOnly: true });
+  const rows = readDb.prepare("SELECT composerId, workspaceId, value FROM composerHeaders ORDER BY composerId").all();
+  readDb.close();
+  assert.equal(rows.length, 2);
+  assert.ok(rows.every((row) => row.workspaceId === newWs));
+  for (const row of rows) {
+    const value = JSON.parse(row.value);
+    assert.equal(value.workspaceIdentifier.id, newWs);
+    assert.equal(value.workspaceIdentifier.uri.fsPath, toPath);
+    assert.equal(value.trackedGitRepos[0].repoPath, toPath);
+    assert.equal(value.workspaceIdentifier.uri.external, toFileUri(toPath));
+  }
+});
+
+test("patchGlobalStorage verify throws when composerHeaders table still has conversations on the old workspace", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "cursor-migrate-global-"));
+  const dbPath = path.join(tmp, "state.vscdb");
+  const fromPath = path.join(tmp, "old", "project");
+  const toPath = path.join(tmp, "new", "project");
+  const oldWs = "cccccccccccccccccccccccccccccccc";
+  const newWs = "dddddddddddddddddddddddddddddddd";
+
+  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+  const db = new DatabaseSync(dbPath);
+  db.exec("CREATE TABLE ItemTable (key TEXT PRIMARY KEY, value TEXT)");
+  db.prepare("INSERT INTO ItemTable (key, value) VALUES (?, ?)").run(
+    "composer.composerHeaders",
+    JSON.stringify({ allComposers: [] }),
+  );
+  createComposerHeadersTable(db);
+  insertComposerHeadersRow(db, { composerId: "stuck", workspaceId: oldWs, fsPath: fromPath });
+  db.close();
+
+  assert.throws(
+    () =>
+      patchGlobalStorage(buildMigration(fromPath, toPath, oldWs, newWs), {
+        dbPath,
+        verify: true,
+        skipComposerHeadersTable: true,
+      }),
+    /composerHeaders was not remapped/,
+  );
+});
+
+test("patchGlobalStorage does not rewrite GitHub remote URLs that share the folder name", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "cursor-migrate-global-"));
+  const dbPath = path.join(tmp, "state.vscdb");
+  const fromPath = "/Users/me/Project/everest-dashboard";
+  const toPath = "/Users/me/Project/quickscope";
+  const oldWs = "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+  const newWs = "ffffffffffffffffffffffffffffffff";
+
+  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+  const db = new DatabaseSync(dbPath);
+  db.exec("CREATE TABLE ItemTable (key TEXT PRIMARY KEY, value TEXT)");
+  db.prepare("INSERT INTO ItemTable (key, value) VALUES (?, ?)").run(
+    "composer.composerHeaders",
+    JSON.stringify({ allComposers: [] }),
+  );
+  db.prepare("INSERT INTO ItemTable (key, value) VALUES (?, ?)").run(
+    "repositoryTracker.paths",
+    JSON.stringify({
+      "github.com/acme/everest-dashboard": { localPath: `file://${fromPath}` },
+    }),
+  );
+  createComposerHeadersTable(db);
+  db.close();
+
+  patchGlobalStorage(buildMigration(fromPath, toPath, oldWs, newWs), { dbPath, verify: false });
+
+  const readDb = new DatabaseSync(dbPath, { readOnly: true });
+  const row = readDb.prepare("SELECT value FROM ItemTable WHERE key = 'repositoryTracker.paths'").get();
+  readDb.close();
+  const data = JSON.parse(row.value);
+  assert.ok(data["github.com/acme/everest-dashboard"]);
+  assert.equal(data["github.com/acme/everest-dashboard"].localPath, `file://${toPath}`);
+});
+
 test("patchGlobalStorage repair loop remaps composers from multiple stale ids to active id", () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "cursor-migrate-global-"));
   const dbPath = path.join(tmp, "state.vscdb");
