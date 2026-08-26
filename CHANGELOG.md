@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Require **Node.js 24.13.0+** (the version this tool is tested on). Older runtimes exit with a clear error.
+
 ## 0.2.1 — 2026-08-26
 
 Works with the **new Agents Window** in current Cursor.

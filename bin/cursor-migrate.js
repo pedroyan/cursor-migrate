@@ -102,6 +102,6 @@ Notes:
   - --to must be the full destination path, not just the parent directory. An empty pre-created folder is allowed.
   - Cross-volume moves copy the folder; use --repair if chats are missing afterward.
   - Backups are written to the cursor-migrate application folder (see log output for the full path).
-  - Requires Node.js 22.5+ (built-in sqlite support).
+  - Requires Node.js 24.13.0+ (the version this tool is tested on; uses built-in sqlite).
 `);
 }
